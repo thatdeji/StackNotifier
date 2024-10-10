@@ -2,14 +2,16 @@
 import Link from "next/link";
 import { mainMenuItem } from "./DashboardLayout.data";
 import { IDashboardLayoutProps } from "./DashboardLayout.types";
-import { usePathname } from "next/navigation";
-import { cn } from "@/utils/cn";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { CloseIcon, HamburgerIcon } from "./DashboardLayout.vectors";
+import { createClient } from "@/utils/supabase/client";
+import { cn } from "@/lib/utils";
 
 const DashboardLayout: React.FC<IDashboardLayoutProps> = ({ children }) => {
   const pathname = usePathname();
+  const router = useRouter();
   const [isSidebarOpen, setIsSidebarOpen] = useState<boolean>(false);
 
   const handleToggleMenu = () => {
@@ -81,7 +83,13 @@ const DashboardLayout: React.FC<IDashboardLayoutProps> = ({ children }) => {
               ))}
             </ul>
           </div>
-          <Button>
+          <Button
+            onClick={async () => {
+              const supabase = createClient();
+              await supabase.auth.signOut();
+              return router.push("/sign-in");
+            }}
+          >
             <span>Sign out</span>
           </Button>
         </div>

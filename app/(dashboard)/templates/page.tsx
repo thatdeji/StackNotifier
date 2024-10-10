@@ -17,7 +17,7 @@ import { EditIcon } from "@/vectors/edit";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-const templates = [
+const templatesData = [
   {
     id: 0,
     name: "Welcome Template",
@@ -95,7 +95,7 @@ export default function Templates() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {templates.map((template) => (
+          {templatesData.map((template) => (
             <TableRow key={template.id}>
               <TableCell className="font-medium">{template.name}</TableCell>
               <TableCell>{truncateText(template.description, 50)}</TableCell>

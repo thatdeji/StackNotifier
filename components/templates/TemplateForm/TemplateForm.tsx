@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ITemplateFormProps, formSchema } from "./TemplateForm.types";
 import { Input } from "@/components/ui/input";
 import { z } from "zod";
@@ -34,15 +34,19 @@ const TemplateForm: React.FC<ITemplateFormProps> = ({
   btnText,
   heading,
 }) => {
-  const contentState = stateFromHTML(initialValues?.template || "");
-  const newEditorState = EditorState.createWithContent(contentState);
-
-  const [editorState, setEditorState] = useState<EditorState>(newEditorState);
+  const [editorState, setEditorState] = useState<EditorState>(() =>
+    EditorState.createEmpty()
+  );
   const [logo, setLogo] = useState("");
 
   const router = useRouter();
 
-  const htmlContent = stateToHTML(editorState.getCurrentContent());
+  useEffect(() => {
+    const contentState = stateFromHTML(initialValues?.template || "");
+    const newEditorState = EditorState.createWithContent(contentState);
+
+    setEditorState(newEditorState);
+  }, []);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -57,6 +61,10 @@ const TemplateForm: React.FC<ITemplateFormProps> = ({
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     console.log(values);
+    let htmlContent = "";
+    if (editorState) {
+      htmlContent = stateToHTML(editorState?.getCurrentContent());
+    }
     handleSubmit({
       name: values.name,
       description: values.description,

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { useState } from "react";
 
-const reminders = [
+const remindersData = [
   {
     id: 0,
     category: "New Subscription",
@@ -78,7 +78,7 @@ export default function Reminders() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {reminders.map((reminder) => (
+          {remindersData.map((reminder) => (
             <TableRow key={reminder.id}>
               <TableCell className="font-medium">{reminder.category}</TableCell>
               <TableCell>

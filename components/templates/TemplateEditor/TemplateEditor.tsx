@@ -1,5 +1,13 @@
-import React from "react";
-import { Editor } from "react-draft-wysiwyg";
+import React, { ComponentType } from "react";
+import { EditorProps } from "react-draft-wysiwyg";
+import dynamic from "next/dynamic";
+const Editor = dynamic<EditorProps>(
+  async () => {
+    const mod = await import("react-draft-wysiwyg");
+    return { default: mod.Editor as unknown as ComponentType<EditorProps> };
+  },
+  { ssr: false }
+);
 import { EditorState } from "draft-js";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { ITemplateEditorProps } from "./TemplateEditor.types";
