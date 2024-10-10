@@ -10,7 +10,11 @@ import { redirect } from "next/navigation";
 export function encodedRedirect(
   type: "error" | "success",
   path: string,
-  message: string,
+  message: string
 ) {
   return redirect(`${path}?${type}=${encodeURIComponent(message)}`);
 }
+
+export const truncateText = (text: string, limit: number) => {
+  return text && text.length > limit ? `${text.substring(0, limit)}...` : text;
+};

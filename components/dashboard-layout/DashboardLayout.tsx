@@ -21,8 +21,6 @@ const DashboardLayout: React.FC<IDashboardLayoutProps> = ({ children }) => {
     }
   };
 
-  console.log(pathname);
-
   return (
     <div className="w-full h-dvh flex static lg:fixed top-0 left-0">
       <aside
@@ -93,7 +91,11 @@ const DashboardLayout: React.FC<IDashboardLayoutProps> = ({ children }) => {
           <button className="block lg:hidden" onClick={handleToggleMenu}>
             <HamburgerIcon />
           </button>
-          <h1 className="h1 capitalize">{pathname.replace("/", "")}</h1>
+          {mainMenuItem.find((item) => item.link === pathname) ? (
+            <h1 className="heading-one capitalize">
+              {pathname.replace("/", "")}
+            </h1>
+          ) : null}
         </div>
         <div>{children}</div>
       </main>
