@@ -19,7 +19,7 @@ const ReminderDialog: React.FC<IReminderDialogProps> = ({
   id,
   isOpen,
   onOpenChange,
-  templateName,
+  templateId,
 }) => {
   // Access the client
   const queryClient = useQueryClient();
@@ -29,10 +29,7 @@ const ReminderDialog: React.FC<IReminderDialogProps> = ({
     queryFn: () => getTemplates(),
   });
 
-  const [selectedTemplate, setSelectedTemplate] = useState<{
-    id: number;
-    name: string;
-  } | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
 
   const {
     mutateAsync: editReminderMutation,
@@ -61,20 +58,18 @@ const ReminderDialog: React.FC<IReminderDialogProps> = ({
           <DialogDescription className="text-sm text-gray-800">
             <RadioGroup
               onValueChange={(value) => {
-                console.log(templatesData, value);
-                setSelectedTemplate({
-                  id:
-                    templatesData?.find((template) => template.name === value)
-                      ?.id ?? 0,
-                  name: value,
-                });
+                console.log(value);
+                setSelectedTemplate(value);
               }}
               className="gap-6"
-              defaultValue={templateName || ""}
+              defaultValue={templateId?.toString() || ""}
             >
               {templatesData?.map((template) => (
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value={template.name} id={template.name} />
+                  <RadioGroupItem
+                    value={template.id.toString()}
+                    id={template.name}
+                  />
                   <Label htmlFor={template.name}>{template.name}</Label>
                 </div>
               ))}
@@ -92,7 +87,7 @@ const ReminderDialog: React.FC<IReminderDialogProps> = ({
               if (!id || !selectedTemplate) return;
               const res = await editReminderMutation({
                 id: id,
-                template_id: selectedTemplate?.id,
+                template_id: Number(selectedTemplate),
               });
               onOpenChange(false);
             }}

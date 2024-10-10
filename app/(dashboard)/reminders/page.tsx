@@ -19,12 +19,12 @@ export default function Reminders() {
     isOpen: boolean;
     name: string | null;
     id: number | null;
-    templateName: string | null;
+    templateId: string | null;
   }>({
     isOpen: false,
     name: "",
     id: null,
-    templateName: null,
+    templateId: null,
   });
 
   const { data: remindersData } = useQuery({
@@ -36,14 +36,14 @@ export default function Reminders() {
     <div className="">
       <ReminderDialog
         id={reminderModal.id}
-        templateName={reminderModal.templateName}
+        templateId={reminderModal.templateId}
         isOpen={reminderModal.isOpen}
         onOpenChange={(open: boolean) =>
           setReminderModal({
             isOpen: open,
             id: null,
             name: null,
-            templateName: null,
+            templateId: null,
           })
         }
       />
@@ -80,7 +80,7 @@ export default function Reminders() {
                       isOpen: true,
                       id: reminder.id,
                       name: reminder?.name,
-                      templateName: reminder?.template?.name,
+                      templateId: reminder?.template?.id.toString(),
                     })
                   }
                   className="text-blue-500"

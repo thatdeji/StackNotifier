@@ -2,7 +2,6 @@
 
 import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Database } from "@/database.types";
 
@@ -23,35 +22,13 @@ export const signInAction = async (formData: FormData) => {
   return redirect("/templates");
 };
 
-interface Reminder {
-  id: number;
-  created_at: string;
-  name: string;
-  template_name: string | null;
-  template_id: number | null;
-  event: string;
-  description: string;
-  success_emails: number | null;
-  failed_emails: number | null;
-}
-
-interface Template {
-  id: number;
-  created_at: string;
-  name: string;
-  template: string;
-  description: string;
-  reminder_name: string;
-  reminder_id: number;
-}
-
 export const getReminders = async () => {
   const supabase = createClient();
 
   let { data: reminders, error } = await supabase
     .from("reminders")
-    .select(`*, template:template_id (*)`);
-  console.log(reminders);
+    .select(`*, template:template_id (*)`)
+    .order("created_at", { ascending: false });
 
   if (error) {
     throw new Error(error.message);
@@ -62,9 +39,28 @@ export const getReminders = async () => {
   }
 };
 
-type SingleReminder = {
-  id: number;
-  name: string;
+export const editReminder = async (
+  formData: Partial<
+    Pick<
+      Database["public"]["Tables"]["reminders"]["Row"],
+      "description" | "name" | "template_id"
+    >
+  > & { id: number }
+) => {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("reminders")
+    .update(formData)
+    .eq("id", formData.id)
+    .select();
+
+  if (data) {
+    return data;
+  }
+  if (error) {
+    throw new Error(error.message);
+  }
 };
 
 export const getTemplates = async () => {
@@ -72,7 +68,8 @@ export const getTemplates = async () => {
 
   const { data: templates, error } = await supabase
     .from("templates")
-    .select("*, reminder:reminders!reminder_id(id, name)");
+    .select("*, reminder:reminders!reminder_id(id, name)")
+    .order("created_at", { ascending: false });
 
   if (error) {
     throw new Error(error.message);
@@ -125,14 +122,40 @@ export const addTemplate = async (
 export const deleteTemplate = async (id: number) => {
   const supabase = createClient();
 
+  // Step 1: Check for dependent reminders
+  const { data: reminders, error: remindersError } = await supabase
+    .from("reminders")
+    .select("*")
+    .eq("template_id", id); // Check for reminders associated with this template
+
+  // Handle any errors during the reminders query
+  if (remindersError) {
+    throw new Error(remindersError.message);
+  }
+
+  // Step 2: If there are reminders, update them to remove the template association
+  if (reminders && reminders.length > 0) {
+    const { error: updateRemindersError } = await supabase
+      .from("reminders")
+      .update({ template_id: null }) // Remove the template association
+      .eq("template_id", id);
+
+    if (updateRemindersError) {
+      throw new Error(updateRemindersError.message);
+    }
+  }
+
+  // Step 3: Delete the template after handling reminders
   const { data, error } = await supabase
     .from("templates")
     .delete()
     .eq("id", id)
     .select();
+
   if (data) {
     return data;
   }
+
   if (error) {
     throw new Error(error.message);
   }
@@ -150,29 +173,6 @@ export const editTemplate = async (
 
   const { data, error } = await supabase
     .from("templates")
-    .update(formData)
-    .eq("id", formData.id)
-    .select();
-  if (data) {
-    return data;
-  }
-  if (error) {
-    throw new Error(error.message);
-  }
-};
-
-export const editReminder = async (
-  formData: Partial<
-    Pick<
-      Database["public"]["Tables"]["reminders"]["Row"],
-      "description" | "name" | "event" | "template_id"
-    >
-  > & { id: number }
-) => {
-  const supabase = createClient();
-
-  const { data, error } = await supabase
-    .from("reminders")
     .update(formData)
     .eq("id", formData.id)
     .select();

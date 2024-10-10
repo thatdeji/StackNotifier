@@ -9,6 +9,8 @@ import {
 import { IDeleteTemplateProps } from "./DeleteTemplate.types";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { deleteTemplate } from "@/app/actions";
 
 const DeleteTemplate: React.FC<IDeleteTemplateProps> = ({
   isOpen,
@@ -16,6 +18,25 @@ const DeleteTemplate: React.FC<IDeleteTemplateProps> = ({
   id,
   name,
 }) => {
+  const queryClient = useQueryClient();
+
+  const {
+    mutateAsync: mutateDeleteTemplate,
+    isPending: isPendingDeleteTemplate,
+  } = useMutation({
+    mutationFn: deleteTemplate,
+    onError: (error) => {
+      console.log(error);
+    },
+    onSuccess: () => {
+      console.log("Template deleted");
+      queryClient.invalidateQueries({
+        queryKey: ["templates"],
+      });
+      onOpenChange(false);
+    },
+  });
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="w-[90%]">
@@ -35,7 +56,17 @@ const DeleteTemplate: React.FC<IDeleteTemplateProps> = ({
               Close
             </Button>
           </DialogClose>
-          <Button type="button" variant="destructive">
+          <Button
+            type="button"
+            onClick={async () => {
+              console.log(id);
+              if (id) {
+                await mutateDeleteTemplate(id);
+                console.log("Template deleted id");
+              }
+            }}
+            variant="destructive"
+          >
             Delete
           </Button>
         </DialogFooter>
