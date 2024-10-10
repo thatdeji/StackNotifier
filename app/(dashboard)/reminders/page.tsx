@@ -1,4 +1,5 @@
 "use client";
+import { getReminders } from "@/app/actions";
 import ReminderDialog from "@/components/reminders/ReminderDialog/ReminderDialog";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,58 +11,40 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-
-const remindersData = [
-  {
-    id: 0,
-    category: "New Subscription",
-    selectedTemplate: {
-      id: 0,
-      name: "Welcome Template",
-      description: "Send a welcome email to new customers",
-    },
-    successfulEmails: 30,
-    failedEmails: 2,
-  },
-  {
-    id: 1,
-    category: "Subscription Renewal",
-    selectedTemplate: null,
-    successfulEmails: 0,
-    failedEmails: 0,
-  },
-  {
-    id: 2,
-    category: "Cancelled Subscription",
-    selectedTemplate: {
-      id: 2,
-      name: "Cancellation Follow-Up",
-      description: "Send a follow-up email to customers who recently canceled",
-    },
-    successfulEmails: 30,
-    failedEmails: 0,
-  },
-];
 
 export default function Reminders() {
   const [reminderModal, setReminderModal] = useState<{
     isOpen: boolean;
     name: string | null;
-    categoryId: number | null;
+    id: number | null;
+    templateName: string | null;
   }>({
     isOpen: false,
     name: "",
-    categoryId: null,
+    id: null,
+    templateName: null,
+  });
+
+  const { data: remindersData } = useQuery({
+    queryKey: ["reminders"],
+    queryFn: () => getReminders(),
   });
 
   return (
     <div className="">
       <ReminderDialog
-        id={reminderModal.categoryId}
+        id={reminderModal.id}
+        templateName={reminderModal.templateName}
         isOpen={reminderModal.isOpen}
         onOpenChange={(open: boolean) =>
-          setReminderModal({ isOpen: open, categoryId: null, name: null })
+          setReminderModal({
+            isOpen: open,
+            id: null,
+            name: null,
+            templateName: null,
+          })
         }
       />
       <Table>
@@ -78,31 +61,32 @@ export default function Reminders() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {remindersData.map((reminder) => (
+          {remindersData?.map((reminder) => (
             <TableRow key={reminder.id}>
-              <TableCell className="font-medium">{reminder.category}</TableCell>
+              <TableCell className="font-medium">{reminder?.name}</TableCell>
               <TableCell>
-                {reminder.selectedTemplate?.name || "No template assigned"}
+                {reminder?.template?.name || "No template assigned"}
               </TableCell>
               <TableCell className="font-medium">
-                {reminder.successfulEmails}
+                {reminder?.success_emails || 0}
               </TableCell>
               <TableCell className="font-medium">
-                {reminder.failedEmails}
+                {reminder?.failed_emails || 0}
               </TableCell>
               <TableCell>
                 <Button
                   onClick={() =>
                     setReminderModal({
                       isOpen: true,
-                      categoryId: reminder.id,
-                      name: reminder.category,
+                      id: reminder.id,
+                      name: reminder?.name,
+                      templateName: reminder?.template?.name,
                     })
                   }
                   className="text-blue-500"
                   variant="ghost"
                 >
-                  {reminder.selectedTemplate ? "Edit" : "Assign"}
+                  {reminder?.template?.name ? "Edit" : "Assign"}
                 </Button>
               </TableCell>
             </TableRow>

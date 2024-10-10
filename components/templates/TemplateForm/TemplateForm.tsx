@@ -27,6 +27,8 @@ import { stateFromHTML } from "draft-js-import-html";
 import { EditorState } from "draft-js";
 import { stateToHTML } from "draft-js-export-html";
 import { useRouter } from "next/navigation";
+import { getReminders } from "@/app/actions";
+import { useQuery } from "@tanstack/react-query";
 
 const TemplateForm: React.FC<ITemplateFormProps> = ({
   handleSubmit,
@@ -34,6 +36,11 @@ const TemplateForm: React.FC<ITemplateFormProps> = ({
   btnText,
   heading,
 }) => {
+  const { data: remindersData } = useQuery({
+    queryKey: ["reminders"],
+    queryFn: () => getReminders(),
+  });
+
   const [editorState, setEditorState] = useState<EditorState>(() =>
     EditorState.createEmpty()
   );
@@ -46,14 +53,14 @@ const TemplateForm: React.FC<ITemplateFormProps> = ({
     const newEditorState = EditorState.createWithContent(contentState);
 
     setEditorState(newEditorState);
-  }, []);
+  }, [initialValues]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: initialValues?.name || "",
       description: initialValues?.description || "",
-      category: initialValues?.category || "",
+      reminder: initialValues?.reminder || "",
     },
   });
 
@@ -70,7 +77,7 @@ const TemplateForm: React.FC<ITemplateFormProps> = ({
       description: values.description,
       template: htmlContent,
       logo,
-      category: values.category,
+      reminder: values.reminder,
     });
   }
 
@@ -127,29 +134,28 @@ const TemplateForm: React.FC<ITemplateFormProps> = ({
           />
           <FormField
             control={form.control}
-            name="category"
+            name="reminder"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Category</FormLabel>
+                <FormLabel>Reminder</FormLabel>
                 <Select
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                 >
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select a category for the template" />
+                      <SelectValue placeholder="Select a reminder for the template" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="New Subscription">
-                      New Subscription
-                    </SelectItem>
-                    <SelectItem value="Subscription Renewal">
-                      Subscription Renewal
-                    </SelectItem>
-                    <SelectItem value="Cancelled Subscription">
-                      Cancelled Subscription
-                    </SelectItem>
+                    {remindersData?.map((reminder) => (
+                      <SelectItem
+                        key={reminder.id}
+                        value={reminder.id.toString()}
+                      >
+                        {reminder.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
                 <FormMessage />

@@ -1,5 +1,6 @@
 "use client";
 
+import { getTemplates } from "@/app/actions";
 import DeleteTemplate from "@/components/templates/DeleteTemplate/DeleteTemplate";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,43 +15,9 @@ import {
 import { truncateText } from "@/utils/utils";
 import { DeleteIcon } from "@/vectors/delete";
 import { EditIcon } from "@/vectors/edit";
+import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
-const templatesData = [
-  {
-    id: 0,
-    name: "Welcome Template",
-    description: "Send a welcome email to new customers",
-    logo: "https://via.placeholder.com/150",
-    template: "Hello, {{name}}! Welcome to our platform.",
-    category: "New Subscriptionw",
-  },
-  {
-    id: 1,
-    name: "Renewal Reminder",
-    description: "Send a reminder to customers to renew their subscription",
-    logo: "https://via.placeholder.com/150",
-    template: "Hi {{name}}, your subscription is about to expire.",
-    category: "Subscription Renewal",
-  },
-  {
-    id: 2,
-    name: "Cancellation Follow-Up",
-    description: "Send a follow-up email to customers who recently canceled",
-    logo: "https://via.placeholder.com/150",
-    template: "We're sorry to see you go. Can we help with anything?",
-    category: "Cancelled Subscription",
-  },
-  {
-    id: 3,
-    name: "Welcome Template 2",
-    description: "Integrate to send a welcome email to new customers",
-    logo: "https://via.placeholder.com/150",
-    template: "How was your experience with our product?",
-    category: "Customer Feedback",
-  },
-];
 
 export default function Templates() {
   const router = useRouter();
@@ -63,6 +30,13 @@ export default function Templates() {
     name: "",
     templateId: null,
   });
+
+  const { data: templatesData } = useQuery({
+    queryKey: ["templates"],
+    queryFn: () => getTemplates(),
+  });
+
+  console.log(templatesData);
 
   return (
     <div className="">
@@ -95,12 +69,16 @@ export default function Templates() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {templatesData.map((template) => (
+          {templatesData?.map((template) => (
             <TableRow key={template.id}>
               <TableCell className="font-medium">{template.name}</TableCell>
-              <TableCell>{truncateText(template.description, 50)}</TableCell>
-              <TableCell>{truncateText(template.template, 100)}</TableCell>
-              <TableCell>{template.category}</TableCell>
+              <TableCell>
+                {truncateText(template.description || "", 50)}
+              </TableCell>
+              <TableCell>
+                {truncateText(template.template || "", 100)}
+              </TableCell>
+              <TableCell>{template?.reminder?.name}</TableCell>
               <TableCell className="">
                 <button
                   onClick={() => router.push(`/templates/${template.id}`)}
@@ -124,12 +102,6 @@ export default function Templates() {
             </TableRow>
           ))}
         </TableBody>
-        {/* <TableFooter>
-        <TableRow>
-          <TableCell colSpan={3}>Total</TableCell>
-          <TableCell className="text-right">$2,500.00</TableCell>
-        </TableRow>
-      </TableFooter> */}
       </Table>
     </div>
   );
