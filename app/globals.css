@@ -67,3 +67,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .h1 {
+    @apply text-xl lg:text-2xl text-gray-900 font-medium;
+  }
+}
