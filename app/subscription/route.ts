@@ -32,6 +32,7 @@ export async function POST(req: NextRequest) {
 
     if (hash === signature) {
       const event = body;
+      //   console.log("Event received:", event);
       const customerEmail = event?.data?.customer?.email;
 
       const reminders = await getReminders();
@@ -40,13 +41,26 @@ export async function POST(req: NextRequest) {
         (reminder) => reminder.event === event.event
       );
 
+      const res = await fetch(
+        `https://api.paystack.co/subscription/${event?.data?.subscription_code}/manage/link`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${secret}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const data = (await res.json()) as { data: { link: string } };
+
       if (reminder && customerEmail) {
         const htmlVars = {
           customer_name: `${event?.data?.customer?.first_name} ${event?.data?.customer?.last_name}`,
           amount: event?.data?.amount?.toLocaleString(),
           subscription_name: event?.data?.plan?.name,
-          next_payment_date: event?.data?.next_payment_date,
+          next_payment_date: formatDate(event?.data?.next_payment_date ?? ""),
           current_date: formatDate(new Date().toISOString()),
+          manage_subscription_link: data?.data?.link,
         };
 
         const mailOptions: Mail.Options = {
