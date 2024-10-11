@@ -56,8 +56,8 @@ export default function Reminders() {
           <TableRow>
             <TableHead className="">Category</TableHead>
             <TableHead>Template name</TableHead>
-            <TableHead>Successful Emails</TableHead>
-            <TableHead>Failed Emails</TableHead>
+            <TableHead>Description</TableHead>
+            <TableHead>Event</TableHead>
             <TableHead></TableHead>
           </TableRow>
         </TableHeader>
@@ -69,11 +69,9 @@ export default function Reminders() {
                 {reminder?.template?.name || "No template assigned"}
               </TableCell>
               <TableCell className="font-medium">
-                {reminder?.success_emails || 0}
+                {reminder?.description}
               </TableCell>
-              <TableCell className="font-medium">
-                {reminder?.failed_emails || 0}
-              </TableCell>
+              <TableCell className="font-medium">{reminder?.event}</TableCell>
               <TableCell>
                 <Button
                   onClick={() =>

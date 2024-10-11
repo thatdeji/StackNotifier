@@ -16,8 +16,8 @@ export const mainMenuItem = [
     link: "/reminders",
   },
   {
-    title: "Mails",
+    title: "Logs",
     icon: <EmailIcon />,
-    link: "/mails",
+    link: "/logs",
   },
 ];

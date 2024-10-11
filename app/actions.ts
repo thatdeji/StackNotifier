@@ -183,3 +183,41 @@ export const editTemplate = async (
     throw new Error(error.message);
   }
 };
+
+export const getLogs = async () => {
+  const supabase = createClient();
+
+  const { data: templates, error } = await supabase
+    .from("logs")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (templates) {
+    return templates;
+  }
+};
+
+export const addLog = async (
+  formData: Pick<
+    Database["public"]["Tables"]["logs"]["Row"],
+    "message" | "status" | "title" | "type"
+  >
+) => {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("logs")
+    .insert([formData])
+    .select();
+
+  if (data) {
+    return data;
+  }
+  if (error) {
+    throw new Error(error.message);
+  }
+};

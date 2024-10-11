@@ -9,15 +9,40 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      logs: {
+        Row: {
+          created_at: string;
+          id: number;
+          message: string | null;
+          status: string | null;
+          title: string | null;
+          type: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: number;
+          message?: string | null;
+          status?: string | null;
+          title?: string | null;
+          type?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          id?: number;
+          message?: string | null;
+          status?: string | null;
+          title?: string | null;
+          type?: string | null;
+        };
+        Relationships: [];
+      };
       reminders: {
         Row: {
           created_at: string;
           description: string | null;
           event: string | null;
-          failed_emails: number | null;
           id: number;
           name: string;
-          success_emails: number | null;
           template_id: number | null;
           template?: Tables<"templates"> | null;
         };
@@ -25,20 +50,16 @@ export type Database = {
           created_at?: string;
           description?: string | null;
           event?: string | null;
-          failed_emails?: number | null;
           id?: number;
           name: string;
-          success_emails?: number | null;
           template_id?: number | null;
         };
         Update: {
           created_at?: string;
           description?: string | null;
           event?: string | null;
-          failed_emails?: number | null;
           id?: number;
           name?: string;
-          success_emails?: number | null;
           template_id?: number | null;
         };
         Relationships: [

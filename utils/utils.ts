@@ -36,3 +36,12 @@ export const formatDate = (dateString: string) => {
 
   return `${formattedDate}, ${formattedTime}`;
 };
+
+export const replaceTemplateVariables = (
+  template: string,
+  variables: { [key: string]: string }
+) =>
+  template.replace(/{{(.*?)}}/g, (_, key) => {
+    const trimmedKey = key.trim();
+    return variables[trimmedKey] || "";
+  });
