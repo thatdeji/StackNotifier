@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
 
       const reminders = await getReminders();
 
-      const reminder = reminders?.find(
+      const reminder = reminders?.reminders?.find(
         (reminder) => reminder.event === event.event
       );
 
@@ -65,7 +65,10 @@ export async function POST(req: NextRequest) {
         console.log(`Email sent to ${customerEmail}`);
 
         await addLog({
-          message: `Email sent to ${customerEmail}`,
+          message: replaceTemplateVariables(
+            reminder.template?.template || "",
+            htmlVars
+          ),
           status: info.accepted.length > 0 ? "success" : "failed", // Check if email was accepted
           title: reminder.name,
           type: reminder.event,

@@ -94,7 +94,7 @@ const DashboardLayout: React.FC<IDashboardLayoutProps> = ({ children }) => {
           </Button>
         </div>
       </aside>
-      <main className="w-full p-6 lg:px-12 lg:py-10 flex flex-col gap-6 flex-grow overflow-x-hidden">
+      <main className="w-full p-6 lg:px-12 lg:py-10 flex flex-col gap-6 flex-grow overflow-x-hidden min-h-screen">
         <div className="w-full flex gap-4 items-center">
           <button className="block lg:hidden" onClick={handleToggleMenu}>
             <HamburgerIcon />
@@ -105,7 +105,7 @@ const DashboardLayout: React.FC<IDashboardLayoutProps> = ({ children }) => {
             </h1>
           ) : null}
         </div>
-        <div>{children}</div>
+        <div className="flex-grow flex flex-col">{children}</div>
       </main>
     </div>
   );

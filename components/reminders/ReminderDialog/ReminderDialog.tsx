@@ -46,8 +46,6 @@ const ReminderDialog: React.FC<IReminderDialogProps> = ({
     },
   });
 
-  console.log(templatesData);
-
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="w-[90%]">
@@ -64,7 +62,7 @@ const ReminderDialog: React.FC<IReminderDialogProps> = ({
               className="gap-6"
               defaultValue={templateId?.toString() || ""}
             >
-              {templatesData?.map((template) => (
+              {templatesData?.templates?.map((template) => (
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem
                     value={template.id.toString()}

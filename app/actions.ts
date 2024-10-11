@@ -4,6 +4,7 @@ import { encodedRedirect } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { Database } from "@/database.types";
+import { PAGINATION_LIMIT } from "@/utils/constants";
 
 export const signInAction = async (formData: FormData) => {
   const email = formData.get("email") as string;
@@ -25,9 +26,13 @@ export const signInAction = async (formData: FormData) => {
 export const getReminders = async () => {
   const supabase = createClient();
 
-  let { data: reminders, error } = await supabase
+  let {
+    data: reminders,
+    error,
+    count,
+  } = await supabase
     .from("reminders")
-    .select(`*, template:template_id (*)`)
+    .select(`*, template:template_id (*)`, { count: "exact" })
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -35,7 +40,7 @@ export const getReminders = async () => {
   }
 
   if (reminders) {
-    return reminders;
+    return { reminders, count };
   }
 };
 
@@ -66,9 +71,13 @@ export const editReminder = async (
 export const getTemplates = async () => {
   const supabase = createClient();
 
-  const { data: templates, error } = await supabase
+  const {
+    data: templates,
+    error,
+    count,
+  } = await supabase
     .from("templates")
-    .select("*")
+    .select("*", { count: "exact" })
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -76,7 +85,7 @@ export const getTemplates = async () => {
   }
 
   if (templates) {
-    return templates;
+    return { templates, count };
   }
 };
 
@@ -122,22 +131,20 @@ export const addTemplate = async (
 export const deleteTemplate = async (id: number) => {
   const supabase = createClient();
 
-  // Step 1: Check for dependent reminders
+  // Check for reminders associated with this template &  update them to remove the template association
   const { data: reminders, error: remindersError } = await supabase
     .from("reminders")
     .select("*")
-    .eq("template_id", id); // Check for reminders associated with this template
+    .eq("template_id", id);
 
-  // Handle any errors during the reminders query
   if (remindersError) {
     throw new Error(remindersError.message);
   }
 
-  // Step 2: If there are reminders, update them to remove the template association
   if (reminders && reminders.length > 0) {
     const { error: updateRemindersError } = await supabase
       .from("reminders")
-      .update({ template_id: null }) // Remove the template association
+      .update({ template_id: null })
       .eq("template_id", id);
 
     if (updateRemindersError) {
@@ -145,7 +152,7 @@ export const deleteTemplate = async (id: number) => {
     }
   }
 
-  // Step 3: Delete the template after handling reminders
+  //  Delete template after handling reminders
   const { data, error } = await supabase
     .from("templates")
     .delete()
@@ -184,20 +191,26 @@ export const editTemplate = async (
   }
 };
 
-export const getLogs = async () => {
+export const getLogs = async (page: number) => {
   const supabase = createClient();
 
-  const { data: templates, error } = await supabase
+  const {
+    data: logs,
+    error,
+    count,
+  } = await supabase
     .from("logs")
-    .select("*")
-    .order("created_at", { ascending: false });
+    .select("*", { count: "exact" })
+    .order("created_at", { ascending: false })
+    .range(page, page + PAGINATION_LIMIT)
+    .limit(10);
 
   if (error) {
     throw new Error(error.message);
   }
 
-  if (templates) {
-    return templates;
+  if (logs) {
+    return { logs, count };
   }
 };
 
