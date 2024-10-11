@@ -4,6 +4,7 @@ import { editTemplate, getSingleTemplate } from "@/app/actions";
 import TemplateForm from "@/components/templates/TemplateForm/TemplateForm";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams, useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function EditTemplate() {
   const { id } = useParams();
@@ -20,10 +21,15 @@ export default function EditTemplate() {
   const { mutateAsync: mutateEditemplate, isPending: isPendingEditTemplate } =
     useMutation({
       mutationFn: editTemplate,
+      onError: (error) => {
+        console.log(error);
+        toast.error(`${error}`);
+      },
       onSuccess: () => {
         queryClient.invalidateQueries({
           queryKey: ["templates"],
         });
+        toast.success("Template updated successfully");
         router.push("/templates");
       },
     });

@@ -7,14 +7,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { IReminderDialogProps } from "./ReminderDialog.types";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { editReminder, getTemplates } from "@/app/actions";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 const ReminderDialog: React.FC<IReminderDialogProps> = ({
   id,
@@ -39,12 +38,14 @@ const ReminderDialog: React.FC<IReminderDialogProps> = ({
     mutationFn: editReminder,
     onError: (error) => {
       console.log(error);
+      toast.error(`${error}`);
     },
     onSuccess: () => {
-      console.log("Reminder edited successfully");
       queryClient.invalidateQueries({
         queryKey: ["reminders"],
       });
+      toast.success("Reminder updated successfully");
+      onOpenChange(false);
     },
   });
 
@@ -118,6 +119,7 @@ const ReminderDialog: React.FC<IReminderDialogProps> = ({
             }}
             type="button"
             variant="default"
+            loading={isPendingEditReminder}
           >
             Submit
           </Button>

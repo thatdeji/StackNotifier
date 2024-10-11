@@ -11,6 +11,7 @@ import { DialogClose } from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteTemplate } from "@/app/actions";
+import toast from "react-hot-toast";
 
 const DeleteTemplate: React.FC<IDeleteTemplateProps> = ({
   isOpen,
@@ -27,12 +28,13 @@ const DeleteTemplate: React.FC<IDeleteTemplateProps> = ({
     mutationFn: deleteTemplate,
     onError: (error) => {
       console.log(error);
+      toast.error(`${error}`);
     },
     onSuccess: () => {
-      console.log("Template deleted");
       queryClient.invalidateQueries({
         queryKey: ["templates"],
       });
+      toast.success("Template deleted successfully");
       onOpenChange(false);
     },
   });
@@ -66,6 +68,7 @@ const DeleteTemplate: React.FC<IDeleteTemplateProps> = ({
               }
             }}
             variant="destructive"
+            loading={isPendingDeleteTemplate}
           >
             Delete
           </Button>

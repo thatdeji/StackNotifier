@@ -4,6 +4,7 @@ import { addTemplate } from "@/app/actions";
 import TemplateForm from "@/components/templates/TemplateForm/TemplateForm";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function AddTemplate() {
   const queryClient = useQueryClient();
@@ -15,11 +16,13 @@ export default function AddTemplate() {
       mutationFn: addTemplate,
       onError: (error) => {
         console.log(error);
+        toast.error(`${error}`);
       },
       onSuccess: () => {
         queryClient.invalidateQueries({
           queryKey: ["templates"],
         });
+        toast.success("Template created successfully");
         router.push("/templates");
       },
     });
