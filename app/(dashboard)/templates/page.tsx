@@ -88,7 +88,11 @@ export default function Templates() {
                   {truncateText(template.description || "", 20)}
                 </TableCell>
                 <TableCell>
-                  {truncateText(template.template || "", 50)}
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: truncateText(template.template ?? "", 100),
+                    }}
+                  ></div>
                 </TableCell>
                 <TableCell>{formatDate(template?.created_at ?? "")}</TableCell>
                 <TableCell className="">

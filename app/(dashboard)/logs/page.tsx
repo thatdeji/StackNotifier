@@ -51,7 +51,13 @@ export default function Logs() {
             {logsData?.logs?.map((log) => (
               <TableRow key={log.id}>
                 <TableCell className="font-medium">{log.title}</TableCell>
-                <TableCell>{truncateText(log.message || "", 50)}</TableCell>
+                <TableCell className="max-w-[500px] overflow-x-hidden">
+                  <div
+                    dangerouslySetInnerHTML={{
+                      __html: log.message ?? "",
+                    }}
+                  ></div>
+                </TableCell>
                 <TableCell>{formatDate(log?.created_at ?? "")}</TableCell>
                 <TableCell className="capitalize">{log.status}</TableCell>
                 <TableCell>{log.type}</TableCell>
