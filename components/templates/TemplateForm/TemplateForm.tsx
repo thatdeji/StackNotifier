@@ -30,7 +30,6 @@ const TemplateForm: React.FC<ITemplateFormProps> = ({
   const [editorState, setEditorState] = useState<EditorState>(() =>
     EditorState.createEmpty()
   );
-  const [logo, setLogo] = useState("");
 
   const router = useRouter();
 
@@ -59,7 +58,6 @@ const TemplateForm: React.FC<ITemplateFormProps> = ({
       name: values.name,
       description: values.description,
       template: htmlContent,
-      logo,
     });
   }
 
@@ -74,7 +72,6 @@ const TemplateForm: React.FC<ITemplateFormProps> = ({
           Cancel
         </button>
       </div>
-      {/* Form goes here */}
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <FormField
@@ -91,7 +88,39 @@ const TemplateForm: React.FC<ITemplateFormProps> = ({
             )}
           />
           <div className="space-y-2">
-            <FormLabel>Template</FormLabel>
+            <FormLabel>
+              Template
+              <p className="text-gray-700 mt-4 leading-loose">
+                You can use the following variables in your template:
+                <span className="block mt-2">
+                  <code className="bg-gray-100 text-primary px-2 py-1 rounded font-mono">
+                    &#123;&#123;customer_name&#125;&#125;
+                  </code>
+                  ,
+                  <code className="bg-gray-100 text-primary px-2 py-1 rounded font-mono">
+                    &#123;&#123;amount&#125;&#125;
+                  </code>
+                  ,
+                  <code className="bg-gray-100 text-primary px-2 py-1 rounded font-mono">
+                    &#123;&#123;subscription_name&#125;&#125;
+                  </code>
+                  ,
+                  <code className="bg-gray-100 text-primary px-2 py-1 rounded font-mono">
+                    &#123;&#123;next_payment_date&#125;&#125;
+                  </code>
+                  ,
+                  <code className="bg-gray-100 text-primary px-2 py-1 rounded font-mono">
+                    &#123;&#123;current_date&#125;&#125;
+                  </code>
+                  ,
+                  <code className="bg-gray-100 text-primary px-2 py-1 rounded font-mono">
+                    &#123;&#123;manage_subscription_link&#125;&#125;
+                  </code>
+                </span>
+                These placeholders will be replaced with the actual customer
+                data when the email is sent.
+              </p>
+            </FormLabel>
             <TemplateEditor
               editorState={editorState}
               setEditorState={setEditorState}

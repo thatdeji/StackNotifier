@@ -9,7 +9,6 @@ interface ITemplateValues {
   name: string;
   description: string;
   template: string;
-  logo?: string;
 }
 
 export interface ITemplateFormProps {
