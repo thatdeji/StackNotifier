@@ -3,6 +3,7 @@
 import { getTemplates } from "@/app/actions";
 import DeleteTemplate from "@/components/templates/DeleteTemplate/DeleteTemplate";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -34,7 +35,7 @@ export default function Templates() {
     templateId: null,
   });
 
-  const { data: templatesData } = useQuery({
+  const { data: templatesData, isPending: isPendingTemplates } = useQuery({
     queryKey: ["templates"],
     queryFn: () => getTemplates(),
   });
@@ -66,59 +67,69 @@ export default function Templates() {
         </Button>
       </div>
       <div className="flex-grow">
-        <Table>
-          <TableCaption className="sr-only">
-            A list of your templates.
-          </TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="">Name</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Template</TableHead>
-              <TableHead className="">Date Created</TableHead>
-              <TableHead className=""></TableHead>
-              <TableHead className=""></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {templatesData?.templates?.map((template) => (
-              <TableRow key={template.id}>
-                <TableCell className="font-medium">{template.name}</TableCell>
-                <TableCell>
-                  {truncateText(template.description || "", 20)}
-                </TableCell>
-                <TableCell>
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: truncateText(template.template ?? "", 100),
-                    }}
-                  ></div>
-                </TableCell>
-                <TableCell>{formatDate(template?.created_at ?? "")}</TableCell>
-                <TableCell className="">
-                  <button
-                    onClick={() => router.push(`/templates/${template.id}`)}
-                  >
-                    <EditIcon />
-                  </button>
-                </TableCell>
-                <TableCell className="">
-                  <button
-                    onClick={() =>
-                      setDeleteModal({
-                        isOpen: true,
-                        templateId: template.id,
-                        name: template.name,
-                      })
-                    }
-                  >
-                    <DeleteIcon />
-                  </button>
-                </TableCell>
+        {isPendingTemplates ? (
+          <div className="space-y-6">
+            <Skeleton className="h-10" />
+            <Skeleton className="h-10" />
+            <Skeleton className="h-10" />
+          </div>
+        ) : (
+          <Table>
+            <TableCaption className="sr-only">
+              A list of your templates.
+            </TableCaption>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="">Name</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead>Template</TableHead>
+                <TableHead className="">Date Created</TableHead>
+                <TableHead className=""></TableHead>
+                <TableHead className=""></TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {templatesData?.templates?.map((template) => (
+                <TableRow key={template.id}>
+                  <TableCell className="font-medium">{template.name}</TableCell>
+                  <TableCell>
+                    {truncateText(template.description || "", 20)}
+                  </TableCell>
+                  <TableCell>
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: truncateText(template.template ?? "", 100),
+                      }}
+                    ></div>
+                  </TableCell>
+                  <TableCell>
+                    {formatDate(template?.created_at ?? "")}
+                  </TableCell>
+                  <TableCell className="">
+                    <button
+                      onClick={() => router.push(`/templates/${template.id}`)}
+                    >
+                      <EditIcon />
+                    </button>
+                  </TableCell>
+                  <TableCell className="">
+                    <button
+                      onClick={() =>
+                        setDeleteModal({
+                          isOpen: true,
+                          templateId: template.id,
+                          name: template.name,
+                        })
+                      }
+                    >
+                      <DeleteIcon />
+                    </button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
       {Pagination}
     </div>

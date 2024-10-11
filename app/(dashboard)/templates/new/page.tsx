@@ -36,6 +36,7 @@ export default function AddTemplate() {
         }}
         btnText="Create Template"
         heading="Create a new template"
+        loading={isPendingAddTemplate}
       />
     </div>
   );

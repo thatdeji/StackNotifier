@@ -16,4 +16,5 @@ export interface ITemplateFormProps {
   initialValues?: ITemplateValues;
   btnText?: string;
   heading: string;
+  loading?: boolean;
 }

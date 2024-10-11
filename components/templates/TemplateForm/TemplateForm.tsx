@@ -26,6 +26,7 @@ const TemplateForm: React.FC<ITemplateFormProps> = ({
   initialValues,
   btnText,
   heading,
+  loading,
 }) => {
   const [editorState, setEditorState] = useState<EditorState>(() =>
     EditorState.createEmpty()
@@ -143,7 +144,9 @@ const TemplateForm: React.FC<ITemplateFormProps> = ({
               </FormItem>
             )}
           />
-          <Button type="submit">{btnText || "Submit"}</Button>
+          <Button loading={loading} type="submit">
+            {btnText || "Submit"}
+          </Button>
         </form>
       </Form>
     </div>

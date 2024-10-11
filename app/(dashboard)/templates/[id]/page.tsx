@@ -50,6 +50,7 @@ export default function EditTemplate() {
           initialValues={initialValues}
           btnText="Update Template"
           heading="Edit template"
+          loading={isPendingEditTemplate}
         />
       ) : null}
     </div>
