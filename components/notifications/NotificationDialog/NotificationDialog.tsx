@@ -8,14 +8,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Checkbox } from "@/components/ui/checkbox";
-import { IReminderDialogProps } from "./ReminderDialog.types";
+import { INotificationDialogProps } from "./NotificationDialog.types";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { editReminder, getTemplates } from "@/app/actions";
+import { editNotification, getTemplates } from "@/app/actions";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { QUERY_KEY_NOTIFCATIONS, QUERY_KEY_TEMPLATES } from "@/utils/constants";
+import usePagination from "@/custom-hooks/usePagination";
 
-const ReminderDialog: React.FC<IReminderDialogProps> = ({
+const NotificationDialog: React.FC<INotificationDialogProps> = ({
   id,
   isOpen,
   onOpenChange,
@@ -24,30 +26,41 @@ const ReminderDialog: React.FC<IReminderDialogProps> = ({
   // Access the client
   const queryClient = useQueryClient();
 
-  const { data: templatesData } = useQuery({
-    queryKey: ["templates"],
-    queryFn: () => getTemplates(),
-  });
-
+  const [page, setPage] = useState<number>(0);
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
 
+  const { data: templatesData } = useQuery({
+    queryKey: [QUERY_KEY_TEMPLATES],
+    queryFn: () => getTemplates(page),
+  });
+
   const {
-    mutateAsync: editReminderMutation,
-    isPending: isPendingEditReminder,
+    mutateAsync: editNotificationMutation,
+    isPending: isPendingEditNotification,
   } = useMutation({
-    mutationFn: editReminder,
+    mutationFn: editNotification,
     onError: (error) => {
       console.log(error);
       toast.error(`${error}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["reminders"],
+        queryKey: [QUERY_KEY_NOTIFCATIONS],
       });
-      toast.success("Reminder updated successfully");
+      toast.success("Notification updated successfully");
       onOpenChange(false);
     },
   });
+
+  const handlePageChange = (page: number) => {
+    setPage(page);
+  };
+
+  const Pagination = usePagination(
+    templatesData?.count ?? 0,
+    handlePageChange,
+    page
+  );
 
   useEffect(() => {
     setSelectedTemplate(templateId);
@@ -58,13 +71,13 @@ const ReminderDialog: React.FC<IReminderDialogProps> = ({
       <DialogContent className="w-[90%]">
         <DialogHeader className="flex flex-col gap-4 mb-4">
           <DialogTitle className="text-lg text-gray-950">
-            Select a template for this reminder
+            Select a template for this notification
           </DialogTitle>
           <DialogDescription className="sr-only">
-            Set a template for this reminder
+            Set a template for this notification
           </DialogDescription>
           <div className="text-sm text-gray-800">
-            <div className="space-y-6">
+            <div className="space-y-6 mb-3">
               {templatesData?.templates?.map((template) => (
                 <div className="flex items-center space-x-2">
                   <Checkbox
@@ -100,6 +113,7 @@ const ReminderDialog: React.FC<IReminderDialogProps> = ({
                 </div>
               ))}
             </div>
+            {Pagination}
           </div>
         </DialogHeader>
         <DialogFooter className="sm:justify-end">
@@ -111,7 +125,7 @@ const ReminderDialog: React.FC<IReminderDialogProps> = ({
           <Button
             onClick={async () => {
               if (!id || !selectedTemplate) return;
-              const res = await editReminderMutation({
+              const res = await editNotificationMutation({
                 id: id,
                 template_id: Number(selectedTemplate),
               });
@@ -119,7 +133,7 @@ const ReminderDialog: React.FC<IReminderDialogProps> = ({
             }}
             type="button"
             variant="default"
-            loading={isPendingEditReminder}
+            loading={isPendingEditNotification}
           >
             Submit
           </Button>
@@ -129,4 +143,4 @@ const ReminderDialog: React.FC<IReminderDialogProps> = ({
   );
 };
 
-export default ReminderDialog;
+export default NotificationDialog;

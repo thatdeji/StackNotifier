@@ -15,12 +15,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import usePagination from "@/custom-hooks/usePagination";
 import { Skeleton } from "@/components/ui/skeleton";
+import { QUERY_KEY_LOGS } from "@/utils/constants";
 
 export default function Logs() {
   const [page, setPage] = useState<number>(0);
 
   const { data: logsData, isPending: isPendingLogs } = useQuery({
-    queryKey: ["logs"],
+    queryKey: [QUERY_KEY_LOGS, page],
     queryFn: () => getLogs(page),
   });
 

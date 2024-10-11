@@ -23,31 +23,33 @@ export const signInAction = async (formData: FormData) => {
   return redirect("/templates");
 };
 
-export const getReminders = async () => {
+export const getNotifications = async (page: number) => {
   const supabase = createClient();
 
   let {
-    data: reminders,
+    data: notifications,
     error,
     count,
   } = await supabase
-    .from("reminders")
+    .from("notifications")
     .select(`*, template:template_id (*)`, { count: "exact" })
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(page, page + PAGINATION_LIMIT)
+    .limit(PAGINATION_LIMIT);
 
   if (error) {
     throw new Error(error.message);
   }
 
-  if (reminders) {
-    return { reminders, count };
+  if (notifications) {
+    return { notifications, count };
   }
 };
 
-export const editReminder = async (
+export const editNotification = async (
   formData: Partial<
     Pick<
-      Database["public"]["Tables"]["reminders"]["Row"],
+      Database["public"]["Tables"]["notifications"]["Row"],
       "description" | "name" | "template_id"
     >
   > & { id: number }
@@ -55,7 +57,7 @@ export const editReminder = async (
   const supabase = createClient();
 
   const { data, error } = await supabase
-    .from("reminders")
+    .from("notifications")
     .update(formData)
     .eq("id", formData.id)
     .select();
@@ -68,7 +70,7 @@ export const editReminder = async (
   }
 };
 
-export const getTemplates = async () => {
+export const getTemplates = async (page: number) => {
   const supabase = createClient();
 
   const {
@@ -78,7 +80,9 @@ export const getTemplates = async () => {
   } = await supabase
     .from("templates")
     .select("*", { count: "exact" })
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .range(page, page + PAGINATION_LIMIT)
+    .limit(PAGINATION_LIMIT);
 
   if (error) {
     throw new Error(error.message);
@@ -131,28 +135,28 @@ export const addTemplate = async (
 export const deleteTemplate = async (id: number) => {
   const supabase = createClient();
 
-  // Check for reminders associated with this template &  update them to remove the template association
-  const { data: reminders, error: remindersError } = await supabase
-    .from("reminders")
+  // Check for notifications associated with this template &  update them to remove the template association
+  const { data: notifications, error: notificationsError } = await supabase
+    .from("notifications")
     .select("*")
     .eq("template_id", id);
 
-  if (remindersError) {
-    throw new Error(remindersError.message);
+  if (notificationsError) {
+    throw new Error(notificationsError.message);
   }
 
-  if (reminders && reminders.length > 0) {
-    const { error: updateRemindersError } = await supabase
-      .from("reminders")
+  if (notifications && notifications.length > 0) {
+    const { error: updatenotificationsError } = await supabase
+      .from("notifications")
       .update({ template_id: null })
       .eq("template_id", id);
 
-    if (updateRemindersError) {
-      throw new Error(updateRemindersError.message);
+    if (updatenotificationsError) {
+      throw new Error(updatenotificationsError.message);
     }
   }
 
-  //  Delete template after handling reminders
+  //  Delete template after handling notifications
   const { data, error } = await supabase
     .from("templates")
     .delete()
@@ -203,7 +207,7 @@ export const getLogs = async (page: number) => {
     .select("*", { count: "exact" })
     .order("created_at", { ascending: false })
     .range(page, page + PAGINATION_LIMIT)
-    .limit(10);
+    .limit(PAGINATION_LIMIT);
 
   if (error) {
     throw new Error(error.message);

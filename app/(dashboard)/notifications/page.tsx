@@ -1,8 +1,7 @@
 "use client";
-import { getReminders } from "@/app/actions";
-import ReminderDialog from "@/components/reminders/ReminderDialog/ReminderDialog";
+import { getNotifications } from "@/app/actions";
+import NotificationDialog from "@/components/notifications/NotificationDialog/NotificationDialog";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
@@ -14,11 +13,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import usePagination from "@/custom-hooks/usePagination";
+import { QUERY_KEY_NOTIFCATIONS } from "@/utils/constants";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
-export default function Reminders() {
-  const [reminderModal, setReminderModal] = useState<{
+export default function notifications() {
+  const [notificationModal, setnotificationModal] = useState<{
     isOpen: boolean;
     name: string | null;
     id: number | null;
@@ -31,29 +31,30 @@ export default function Reminders() {
   });
   const [page, setPage] = useState<number>(0);
 
-  const { data: remindersData, isPending: isPendingReminders } = useQuery({
-    queryKey: ["reminders"],
-    queryFn: () => getReminders(),
-  });
+  const { data: notificationsData, isPending: isPendingnotifications } =
+    useQuery({
+      queryKey: [QUERY_KEY_NOTIFCATIONS],
+      queryFn: () => getNotifications(page),
+    });
 
   const handlePageChange = (page: number) => {
     setPage(page);
   };
 
   const Pagination = usePagination(
-    remindersData?.count ?? 0,
+    notificationsData?.count ?? 0,
     handlePageChange,
     page
   );
 
   return (
     <div className="flex flex-col gap-4 flex-grow">
-      <ReminderDialog
-        id={reminderModal.id}
-        templateId={reminderModal.templateId}
-        isOpen={reminderModal.isOpen}
+      <NotificationDialog
+        id={notificationModal.id}
+        templateId={notificationModal.templateId}
+        isOpen={notificationModal.isOpen}
         onOpenChange={(open: boolean) =>
-          setReminderModal({
+          setnotificationModal({
             isOpen: open,
             id: null,
             name: null,
@@ -63,7 +64,7 @@ export default function Reminders() {
       />
 
       <div className="flex-grow">
-        {isPendingReminders ? (
+        {isPendingnotifications ? (
           <div className="space-y-6">
             <Skeleton className="h-10" />
             <Skeleton className="h-10" />
@@ -72,7 +73,7 @@ export default function Reminders() {
         ) : (
           <Table>
             <TableCaption className="sr-only">
-              A list of your reminders.
+              A list of your notifications.
             </TableCaption>
             <TableHeader>
               <TableRow>
@@ -84,34 +85,34 @@ export default function Reminders() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {remindersData?.reminders?.map((reminder) => (
-                <TableRow key={reminder.id}>
+              {notificationsData?.notifications?.map((notification) => (
+                <TableRow key={notification.id}>
                   <TableCell className="font-medium">
-                    {reminder?.name}
+                    {notification?.name}
                   </TableCell>
                   <TableCell>
-                    {reminder?.template?.name || "No template assigned"}
+                    {notification?.template?.name || "No template assigned"}
                   </TableCell>
                   <TableCell className="font-medium">
-                    {reminder?.description}
+                    {notification?.description}
                   </TableCell>
                   <TableCell className="font-medium">
-                    {reminder?.event}
+                    {notification?.event}
                   </TableCell>
                   <TableCell>
                     <Button
                       onClick={() =>
-                        setReminderModal({
+                        setnotificationModal({
                           isOpen: true,
-                          id: reminder.id,
-                          name: reminder?.name,
-                          templateId: reminder?.template?.id.toString(),
+                          id: notification.id,
+                          name: notification?.name,
+                          templateId: notification?.template?.id.toString(),
                         })
                       }
                       className="text-blue-500"
                       variant="ghost"
                     >
-                      {reminder?.template?.name ? "Edit" : "Assign"}
+                      {notification?.template?.name ? "Edit" : "Assign"}
                     </Button>
                   </TableCell>
                 </TableRow>

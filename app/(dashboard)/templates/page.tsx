@@ -14,6 +14,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import usePagination from "@/custom-hooks/usePagination";
+import { QUERY_KEY_TEMPLATES } from "@/utils/constants";
 import { formatDate, truncateText } from "@/utils/utils";
 import { DeleteIcon } from "@/vectors/delete";
 import { EditIcon } from "@/vectors/edit";
@@ -36,8 +37,8 @@ export default function Templates() {
   });
 
   const { data: templatesData, isPending: isPendingTemplates } = useQuery({
-    queryKey: ["templates"],
-    queryFn: () => getTemplates(),
+    queryKey: [QUERY_KEY_TEMPLATES, page],
+    queryFn: () => getTemplates(page),
   });
 
   const handlePageChange = (page: number) => {

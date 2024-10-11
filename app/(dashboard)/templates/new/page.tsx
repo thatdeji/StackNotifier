@@ -2,6 +2,7 @@
 
 import { addTemplate } from "@/app/actions";
 import TemplateForm from "@/components/templates/TemplateForm/TemplateForm";
+import { QUERY_KEY_TEMPLATES } from "@/utils/constants";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -20,7 +21,7 @@ export default function AddTemplate() {
       },
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: ["templates"],
+          queryKey: [QUERY_KEY_TEMPLATES],
         });
         toast.success("Template created successfully");
         router.push("/templates");

@@ -11,9 +11,9 @@ export const mainMenuItem = [
     link: "/templates",
   },
   {
-    title: "Reminders",
+    title: "Notifications",
     icon: <ReminderIcon />,
-    link: "/reminders",
+    link: "/notifications",
   },
   {
     title: "Logs",

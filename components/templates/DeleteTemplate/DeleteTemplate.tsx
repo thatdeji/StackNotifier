@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteTemplate } from "@/app/actions";
 import toast from "react-hot-toast";
+import { QUERY_KEY_TEMPLATES } from "@/utils/constants";
 
 const DeleteTemplate: React.FC<IDeleteTemplateProps> = ({
   isOpen,
@@ -32,7 +33,7 @@ const DeleteTemplate: React.FC<IDeleteTemplateProps> = ({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["templates"],
+        queryKey: [QUERY_KEY_TEMPLATES],
       });
       toast.success("Template deleted successfully");
       onOpenChange(false);

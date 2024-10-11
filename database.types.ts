@@ -36,7 +36,7 @@ export type Database = {
         };
         Relationships: [];
       };
-      reminders: {
+      notifications: {
         Row: {
           created_at: string;
           description: string | null;

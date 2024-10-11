@@ -3,8 +3,9 @@ import crypto from "crypto";
 import { NextRequest } from "next/server";
 import nodemailer from "nodemailer";
 import Mail from "nodemailer/lib/mailer";
-import { addLog, getReminders } from "../actions";
+import { addLog, getNotifications } from "../actions";
 import { formatDate, replaceTemplateVariables } from "@/utils/utils";
+import { createClient } from "@/utils/supabase/server";
 
 const secret = process.env.PAYSTACK_SECRET_KEY as string;
 const mailUser = process.env.MAIL_USER as string;
@@ -35,11 +36,17 @@ export async function POST(req: NextRequest) {
       //   console.log("Event received:", event);
       const customerEmail = event?.data?.customer?.email;
 
-      const reminders = await getReminders();
+      const supabase = createClient();
 
-      const reminder = reminders?.reminders?.find(
-        (reminder) => reminder.event === event.event
-      );
+      let { data: notification, error } = await supabase
+        .from("notifications")
+        .select(`*`)
+        .eq("event", event.event)
+        .single();
+
+      if (error) {
+        throw new Error(error.message);
+      }
 
       const res = await fetch(
         `https://api.paystack.co/subscription/${event?.data?.subscription_code}/manage/link`,
@@ -53,7 +60,7 @@ export async function POST(req: NextRequest) {
       );
       const data = (await res.json()) as { data: { link: string } };
 
-      if (reminder && customerEmail) {
+      if (notification && customerEmail) {
         const htmlVars = {
           customer_name: `${event?.data?.customer?.first_name} ${event?.data?.customer?.last_name}`,
           amount: event?.data?.amount?.toLocaleString(),
@@ -66,9 +73,9 @@ export async function POST(req: NextRequest) {
         const mailOptions: Mail.Options = {
           from: `Your Company <noreply@${mailUser}>`,
           to: customerEmail,
-          subject: `${reminder.name}`,
+          subject: `${notification.name}`,
           html: replaceTemplateVariables(
-            reminder.template?.template || "",
+            notification.template?.template || "",
             htmlVars
           ),
         };
@@ -80,12 +87,12 @@ export async function POST(req: NextRequest) {
 
         await addLog({
           message: replaceTemplateVariables(
-            reminder.template?.template || "",
+            notification.template?.template || "",
             htmlVars
           ),
           status: info.accepted.length > 0 ? "success" : "failed", // Check if email was accepted
-          title: reminder.name,
-          type: reminder.event,
+          title: notification.name,
+          type: notification.event,
         });
       }
 

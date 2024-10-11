@@ -3,9 +3,9 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Stack Reminder",
+  title: "Stack Notifier",
   description:
-    "Keep track of recurring payments and send reminders to customers for upcoming or overdue payments.",
+    "Keep track of recurring payments and send notifications to customers for upcoming or overdue payments.",
 };
 
 export default async function RootLayout({
