@@ -5,7 +5,11 @@ import { IDashboardLayoutProps } from "./DashboardLayout.types";
 import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { CloseIcon, HamburgerIcon } from "./DashboardLayout.vectors";
+import {
+  CloseIcon,
+  HamburgerIcon,
+  ReminderIcon,
+} from "./DashboardLayout.vectors";
 import { createClient } from "@/utils/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -61,6 +65,16 @@ const DashboardLayout: React.FC<IDashboardLayoutProps> = ({ children }) => {
             >
               <CloseIcon />
             </button>
+            <div className="flex items-center space-x-2">
+              <ReminderIcon width="24" height="24" className="w-6 h-6" />
+
+              <div>
+                <span className="text-lg font-bold text-gray-800">Stack</span>
+                <span className="text-lg font-bold text-green-500">
+                  Notifier
+                </span>
+              </div>
+            </div>
             <ul className="list-none flex flex-col gap-2">
               {mainMenuItem.map((item, index) => (
                 <li key={index} className="w-full">
