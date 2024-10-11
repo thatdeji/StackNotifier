@@ -32,7 +32,6 @@ export default function EditTemplate() {
     name: templateData?.name,
     description: templateData?.description || "",
     template: templateData?.template || "",
-    reminder: templateData?.reminder_id?.toString() || "",
   };
 
   return (
@@ -45,7 +44,6 @@ export default function EditTemplate() {
               id: Number(id),
               name: values.name,
               description: values.description,
-              reminder_id: Number(values.reminder),
               template: values.template,
             });
           }}
