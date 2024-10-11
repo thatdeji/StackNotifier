@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { NextRequest } from "next/server";
 import nodemailer from "nodemailer";
 import Mail from "nodemailer/lib/mailer";
-import { addLog, getNotifications } from "../actions";
+import { addLog } from "../actions";
 import { formatDate, replaceTemplateVariables } from "@/utils/utils";
 import { createClient } from "@/utils/supabase/server";
 
@@ -38,15 +38,17 @@ export async function POST(req: NextRequest) {
 
       const supabase = createClient();
 
-      let { data: notification, error } = await supabase
+      let { data: notification } = await supabase
         .from("notifications")
-        .select(`*`)
+        .select(`*, template:template_id (*)`)
         .eq("event", event.event)
         .single();
 
-      if (error) {
-        throw new Error(error.message);
-      }
+      console.log("Notification", notification);
+
+      //   const notification = notifications?.find(
+      //     (notification) => notification.event === event.event
+      //   );
 
       const res = await fetch(
         `https://api.paystack.co/subscription/${event?.data?.subscription_code}/manage/link`,
