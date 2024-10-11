@@ -2,6 +2,7 @@
 import { getReminders } from "@/app/actions";
 import ReminderDialog from "@/components/reminders/ReminderDialog/ReminderDialog";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Table,
   TableBody,

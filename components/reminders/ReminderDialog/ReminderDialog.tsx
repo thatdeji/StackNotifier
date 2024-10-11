@@ -8,12 +8,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { IReminderDialogProps } from "./ReminderDialog.types";
 import { Button } from "@/components/ui/button";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { editReminder, getTemplates } from "@/app/actions";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const ReminderDialog: React.FC<IReminderDialogProps> = ({
   id,
@@ -40,39 +41,65 @@ const ReminderDialog: React.FC<IReminderDialogProps> = ({
       console.log(error);
     },
     onSuccess: () => {
+      console.log("Reminder edited successfully");
       queryClient.invalidateQueries({
         queryKey: ["reminders"],
       });
     },
   });
 
+  useEffect(() => {
+    setSelectedTemplate(templateId);
+  }, [templateId]);
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="w-[90%]">
         <DialogHeader className="flex flex-col gap-4 mb-4">
           <DialogTitle className="text-lg text-gray-950">
-            Select a template for this category
+            Select a template for this reminder
           </DialogTitle>
-          <DialogDescription className="text-sm text-gray-800">
-            <RadioGroup
-              onValueChange={(value) => {
-                console.log(value);
-                setSelectedTemplate(value);
-              }}
-              className="gap-6"
-              defaultValue={templateId?.toString() || ""}
-            >
+          <DialogDescription className="sr-only">
+            Set a template for this reminder
+          </DialogDescription>
+          <div className="text-sm text-gray-800">
+            <div className="space-y-6">
               {templatesData?.templates?.map((template) => (
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem
-                    value={template.id.toString()}
+                  <Checkbox
+                    defaultChecked={
+                      !!(
+                        template.id.toString() === selectedTemplate?.toString()
+                      )
+                    }
+                    checked={
+                      !!(
+                        template.id.toString() === selectedTemplate?.toString()
+                      )
+                    }
                     id={template.name}
+                    onCheckedChange={(checked) => {
+                      if (
+                        template.id.toString() === selectedTemplate?.toString()
+                      ) {
+                        setSelectedTemplate(
+                          checked ? template.id.toString() : null
+                        );
+                      } else {
+                        setSelectedTemplate(template.id.toString());
+                      }
+                    }}
                   />
-                  <Label htmlFor={template.name}>{template.name}</Label>
+                  <label
+                    htmlFor={template.name}
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    {template.name}
+                  </label>
                 </div>
               ))}
-            </RadioGroup>
-          </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
         <DialogFooter className="sm:justify-end">
           <DialogClose asChild>
