@@ -68,7 +68,7 @@ export const getTemplates = async () => {
 
   const { data: templates, error } = await supabase
     .from("templates")
-    .select("*, reminder:reminders!reminder_id(id, name)")
+    .select("*")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -101,7 +101,7 @@ export const getSingleTemplate = async (id: number) => {
 export const addTemplate = async (
   formData: Pick<
     Database["public"]["Tables"]["templates"]["Row"],
-    "description" | "name" | "reminder_id" | "template"
+    "description" | "name" | "template"
   >
 ) => {
   const supabase = createClient();
@@ -165,7 +165,7 @@ export const editTemplate = async (
   formData: Partial<
     Pick<
       Database["public"]["Tables"]["templates"]["Row"],
-      "description" | "name" | "reminder_id" | "template"
+      "description" | "name" | "template"
     >
   > & { id: number }
 ) => {

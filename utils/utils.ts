@@ -18,3 +18,21 @@ export function encodedRedirect(
 export const truncateText = (text: string, limit: number) => {
   return text && text.length > limit ? `${text.substring(0, limit)}...` : text;
 };
+
+export const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+
+  const formattedDate = new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
+
+  const formattedTime = new Intl.DateTimeFormat("en-US", {
+    hour: "numeric",
+    minute: "numeric",
+    hour12: true,
+  }).format(date);
+
+  return `${formattedDate}, ${formattedTime}`;
+};

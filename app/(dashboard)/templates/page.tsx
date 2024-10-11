@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { truncateText } from "@/utils/utils";
+import { formatDate, truncateText } from "@/utils/utils";
 import { DeleteIcon } from "@/vectors/delete";
 import { EditIcon } from "@/vectors/edit";
 import { useQuery } from "@tanstack/react-query";
@@ -63,7 +63,7 @@ export default function Templates() {
             <TableHead className="">Name</TableHead>
             <TableHead>Description</TableHead>
             <TableHead>Template</TableHead>
-            <TableHead className="">Category</TableHead>
+            <TableHead className="">Date Created</TableHead>
             <TableHead className=""></TableHead>
             <TableHead className=""></TableHead>
           </TableRow>
@@ -73,12 +73,10 @@ export default function Templates() {
             <TableRow key={template.id}>
               <TableCell className="font-medium">{template.name}</TableCell>
               <TableCell>
-                {truncateText(template.description || "", 50)}
+                {truncateText(template.description || "", 20)}
               </TableCell>
-              <TableCell>
-                {truncateText(template.template || "", 100)}
-              </TableCell>
-              <TableCell>{template?.reminder?.name}</TableCell>
+              <TableCell>{truncateText(template.template || "", 50)}</TableCell>
+              <TableCell>{formatDate(template?.created_at ?? "")}</TableCell>
               <TableCell className="">
                 <button
                   onClick={() => router.push(`/templates/${template.id}`)}

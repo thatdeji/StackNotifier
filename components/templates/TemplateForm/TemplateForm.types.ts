@@ -3,7 +3,6 @@ import { z } from "zod";
 export const formSchema = z.object({
   name: z.string().min(2).max(100),
   description: z.string().min(2).max(200),
-  reminder: z.string(),
 });
 
 interface ITemplateValues {
@@ -11,7 +10,6 @@ interface ITemplateValues {
   description: string;
   template: string;
   logo?: string;
-  reminder: string;
 }
 
 export interface ITemplateFormProps {

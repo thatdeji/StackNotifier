@@ -31,7 +31,6 @@ export default function AddTemplate() {
           const res = await mutateAddTemplate({
             name: values.name,
             description: values.description,
-            reminder_id: Number(values.reminder),
             template: values.template,
           });
         }}

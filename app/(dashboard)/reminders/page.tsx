@@ -32,6 +32,7 @@ export default function Reminders() {
     queryFn: () => getReminders(),
   });
 
+  console.log(remindersData);
   return (
     <div className="">
       <ReminderDialog

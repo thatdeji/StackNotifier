@@ -15,20 +15,11 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import TemplateEditor from "../TemplateEditor/TemplateEditor";
 import { stateFromHTML } from "draft-js-import-html";
 import { EditorState } from "draft-js";
 import { stateToHTML } from "draft-js-export-html";
 import { useRouter } from "next/navigation";
-import { getReminders } from "@/app/actions";
-import { useQuery } from "@tanstack/react-query";
 
 const TemplateForm: React.FC<ITemplateFormProps> = ({
   handleSubmit,
@@ -36,11 +27,6 @@ const TemplateForm: React.FC<ITemplateFormProps> = ({
   btnText,
   heading,
 }) => {
-  const { data: remindersData } = useQuery({
-    queryKey: ["reminders"],
-    queryFn: () => getReminders(),
-  });
-
   const [editorState, setEditorState] = useState<EditorState>(() =>
     EditorState.createEmpty()
   );
@@ -60,13 +46,10 @@ const TemplateForm: React.FC<ITemplateFormProps> = ({
     defaultValues: {
       name: initialValues?.name || "",
       description: initialValues?.description || "",
-      reminder: initialValues?.reminder || "",
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
     console.log(values);
     let htmlContent = "";
     if (editorState) {
@@ -77,7 +60,6 @@ const TemplateForm: React.FC<ITemplateFormProps> = ({
       description: values.description,
       template: htmlContent,
       logo,
-      reminder: values.reminder,
     });
   }
 
@@ -128,36 +110,6 @@ const TemplateForm: React.FC<ITemplateFormProps> = ({
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="reminder"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Reminder</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a reminder for the template" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {remindersData?.map((reminder) => (
-                      <SelectItem
-                        key={reminder.id}
-                        value={reminder.id.toString()}
-                      >
-                        {reminder.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
                 <FormMessage />
               </FormItem>
             )}

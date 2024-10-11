@@ -19,10 +19,7 @@ export type Database = {
           name: string;
           success_emails: number | null;
           template_id: number | null;
-          template: {
-            id: number;
-            name: string;
-          } | null;
+          template?: Tables<"templates"> | null;
         };
         Insert: {
           created_at?: string;
@@ -60,19 +57,13 @@ export type Database = {
           description: string | null;
           id: number;
           name: string;
-          reminder_id: number | null;
           template: string | null;
-          reminder: {
-            id: number;
-            name: string;
-          } | null;
         };
         Insert: {
           created_at?: string;
           description?: string | null;
           id?: number;
           name?: string;
-          reminder_id?: number | null;
           template?: string | null;
         };
         Update: {
@@ -80,18 +71,9 @@ export type Database = {
           description?: string | null;
           id?: number;
           name?: string;
-          reminder_id?: number | null;
           template?: string | null;
         };
-        Relationships: [
-          {
-            foreignKeyName: "Templates_reminder_id_fkey";
-            columns: ["reminder_id"];
-            isOneToOne: true;
-            referencedRelation: "reminders";
-            referencedColumns: ["id"];
-          },
-        ];
+        Relationships: [];
       };
     };
     Views: {

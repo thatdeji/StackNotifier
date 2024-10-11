@@ -13,7 +13,6 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  console.log(process.env.MAIL_PASS);
   const supabase = createClient();
 
   const {
